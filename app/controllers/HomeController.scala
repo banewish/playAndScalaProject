@@ -1,19 +1,20 @@
 package controllers
 
-import models.{PasswordHash, PasswordRepository}
 
-import java.lang.ProcessBuilder.Redirect
+
+
 import javax.inject._
 import play.api.mvc._
 import play.api._
 import play.api.libs.json.Json
+import services.PasswordService
+
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
-class HomeController @Inject()(repo: PasswordRepository, cc: MessagesControllerComponents) extends MessagesAbstractController(cc) {
+class HomeController @Inject()(passService: PasswordService, cc: MessagesControllerComponents) extends MessagesAbstractController(cc) {
 
-  import UserDataForm._
-
+  import forms.UserDataForm._
 
 
   def index() = Action { implicit request: Request[AnyContent] =>
@@ -30,36 +31,25 @@ class HomeController @Inject()(repo: PasswordRepository, cc: MessagesControllerC
         Future.successful(Ok(views.html.registration(formWithErrors)))
       },
       formData => {
-        repo.create(passwordHash(s = formData.toString)).map { _ =>
+        passService.createIfNotExists(formData.toString).map { _ =>
           Redirect(routes.HomeController.index)
-//                  repo.create(formData.password).map { _ =>   //without hash
-//                  Redirect(routes.HomeController.index)
+
         }
       }
     )
   }
-//
-//
+ //
+
   def getPassword = Action.async { implicit request =>
-    repo.list().map { passwords =>
+    passService.list().map { passwords =>
       Ok(Json.toJson(passwords.toString()))
     }
   }
 
   def deletePassword = Action.async { implicit request =>
-    repo.delete().map { passwords =>
+    passService.delete().map { passwords =>
       Ok(Json.toJson(passwords.toString()))
     }
-  }
-// method pass hash
-  def passwordHash(s: String): String = {
-    import java.security.MessageDigest
-    import java.math.BigInteger
-    val md = MessageDigest.getInstance("MD5")
-    val digest = md.digest(s.getBytes)
-    val bigInt = new BigInteger(1,digest)
-    val hashedString = bigInt.toString(16)
-    hashedString
   }
 
 }
