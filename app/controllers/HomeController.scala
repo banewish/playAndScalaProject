@@ -39,7 +39,7 @@ class HomeController @Inject()(repo: PasswordRepository, cc: MessagesControllerC
     )
   }
 
-
+//
   def getPassword = Action.async { implicit request =>
     repo.list().map { passwords =>
       Ok(Json.toJson(passwords.toString()))
