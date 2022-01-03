@@ -1,6 +1,6 @@
 package models
 
-import controllers.UserDataForm.UserData
+import forms.UserDataForm.UserData
 
 import javax.inject._
 import play.api.db.slick.DatabaseConfigProvider

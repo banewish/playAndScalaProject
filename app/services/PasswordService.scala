@@ -1,4 +1,4 @@
-package controllers
+package services
 
 import com.google.inject.Inject
 import models.{PasswordHash, PasswordRepository}
